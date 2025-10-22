@@ -8,9 +8,11 @@ import Incidencias from "./views/Incidencias";
 import RegistroAsistencia from "./views/RegistroAsistencia";
 import Rol from "./views/Rol";
 import Turnos from "./views/Turnos";
+import Usuarios from "./views/Usuarios";
 
 // Importar archivo de estilos
 import "./App.css";
+
 
 const App = () => {
   return (
@@ -21,9 +23,10 @@ const App = () => {
           <Route path="/" element={<Inicio />} />
           <Route path="/empleados" element={<Empleados />} />
           <Route path="/incidencias" element={<Incidencias />} />
-          <Route path="/registroasistencia" element={<RegistroAsistencia />} />
+          <Route path="/registroAsistencia" element={<RegistroAsistencia />} />
           <Route path="/rol" element={<Rol />} />
           <Route path="/turnos" element={<Turnos />} />
+          <Route path="/usuarios" element={<Usuarios />} />
           {/* Opcional: ruta para 404 */}
           <Route path="*" element={<h2>Página no encontrada</h2>} />
         </Routes>

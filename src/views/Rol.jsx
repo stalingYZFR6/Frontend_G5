@@ -1,63 +1,55 @@
-import React from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import TablaRoles from "../components/Rol/TablaRoles";
 
-const Rol = () => {
-  // Datos de ejemplo, en un proyecto real vendrían de una API o base de datos
-  const roles = [
-    { id: 1, nombre: "Administrador" },
-    { id: 2, nombre: "Cajero" },
-    { id: 3, nombre: "Supervisor" },
-  ];
+const Roles = () => {
+    const [roles, setRoles] = useState([]);
+    const [cargando, setCargando] = useState(true);
 
-  return (
-    <Container className="mt-5">
-      {/* Sección principal con título y descripción */}
-      <Row className="align-items-center text-center text-md-start mb-4">
-        <Col>
-          <h1 className="display-4 fw-bold text-primary">
-            Gestión de Roles
-          </h1>
-          <p className="lead text-secondary">
-            Visualiza, agrega o modifica los roles de los empleados.
-          </p>
-          <Button variant="primary" size="lg">
-            Agregar Nuevo Rol
-          </Button>
-        </Col>
-      </Row>
+    const obtenerRoles = async () => {
+        try {
+            const respuesta = await fetch("http://localhost:3000/api/rol");
+            if (!respuesta.ok) throw new Error("Error al obtener los roles");
 
-      {/* Tabla de roles */}
-      <Row>
-        <Col>
-          <Table striped bordered hover responsive className="text-center">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre del Rol</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((rol) => (
-                <tr key={rol.id}>
-                  <td>{rol.id}</td>
-                  <td>{rol.nombre}</td>
-                  <td>
-                    <Button variant="warning" size="sm" className="me-2">
-                      Editar
+            const datos = await respuesta.json();
+            setRoles(datos);
+            setCargando(false);
+        } catch (error) {
+            console.log(error.message);
+            setCargando(false);
+        }
+    };
+
+    useEffect(() => {
+        obtenerRoles();
+    }, []);
+
+    return (
+        <Container className="mt-5">
+            {/* Sección principal con título y descripción */}
+            <Row className="align-items-center text-center text-md-start mb-4">
+                <Col>
+                    <h1 className="display-4 fw-bold text-primary">Gestión de Roles</h1>
+                    <p className="lead text-secondary">
+                        Visualiza y administra los roles de los empleados en el sistema.
+                    </p>
+                    <Button variant="primary" size="lg">
+                        Agregar Nuevo Rol
                     </Button>
-                    <Button variant="danger" size="sm">
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
-    </Container>
-  );
+                </Col>
+            </Row>
+
+            {/* Tabla de roles */}
+            <Row>
+                <Col>
+                    <TablaRoles
+                        roles={roles}
+                        cargando={cargando}
+                    />
+                </Col>
+            </Row>
+        </Container>
+    );
 };
 
-export default Rol;
+export default Roles;

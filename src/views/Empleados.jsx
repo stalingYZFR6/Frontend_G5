@@ -1,88 +1,91 @@
-import React from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Table, Button, Spinner } from "react-bootstrap";
 
 const Empleados = () => {
-  // Datos de ejemplo, luego podrás traerlos de la base de datos
-  const empleados = [
-    {
-      id_empleado: 1,
-      nombre: "Gerson",
-      apellido: "Magdiel",
-      cedula: "123456789",
-      correo: "gerson@example.com",
-      telefono: "55512345",
-      direccion: "Calle Principal #123",
-      rol: "Administrador",
-    },
-    {
-      id_empleado: 2,
-      nombre: "Staling",
-      apellido: "Gosling",
-      cedula: "987654321",
-      correo: "staling@example.com",
-      telefono: "55567890",
-      direccion: "Avenida Secundaria #456",
-      rol: "Empleado",
-    },
-  ];
+  const [empleados, setEmpleados] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  const obtenerEmpleados = async () => {
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/empleados");
+      if (!respuesta.ok) throw new Error("Error al obtener los empleados");
+
+      const datos = await respuesta.json();
+      setEmpleados(datos);
+      setCargando(false);
+    } catch (error) {
+      console.log(error.message);
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerEmpleados();
+  }, []);
 
   return (
     <Container className="mt-5">
-      {/* Título */}
-      <Row className="text-center text-md-start mb-4">
+      {/* Sección principal con título y descripción */}
+      <Row className="align-items-center text-center text-md-start mb-4">
         <Col>
-          <h1 className="display-4 fw-bold text-primary">
-            Gestión de Empleados
-          </h1>
+          <h1 className="display-4 fw-bold text-primary">Gestión de Empleados</h1>
           <p className="lead text-secondary">
-            Aquí puedes visualizar y administrar todos los empleados.
+            Visualiza y administra los empleados de manera sencilla.
           </p>
           <Button variant="primary" size="lg">
-            Agregar Empleado
+            Agregar Nuevo Empleado
           </Button>
         </Col>
       </Row>
 
-      {/* Tabla de Empleados */}
+      {/* Tabla de empleados */}
       <Row>
         <Col>
-          <Table striped bordered hover responsive className="shadow-sm">
-            <thead className="table-primary">
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Cédula</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Dirección</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {empleados.map((emp) => (
-                <tr key={emp.id_empleado}>
-                  <td>{emp.id_empleado}</td>
-                  <td>{emp.nombre}</td>
-                  <td>{emp.apellido}</td>
-                  <td>{emp.cedula}</td>
-                  <td>{emp.correo}</td>
-                  <td>{emp.telefono}</td>
-                  <td>{emp.direccion}</td>
-                  <td>{emp.rol}</td>
-                  <td>
-                    <Button variant="warning" size="sm" className="me-2">
-                      Editar
-                    </Button>
-                    <Button variant="danger" size="sm">
-                      Eliminar
-                    </Button>
-                  </td>
+          {cargando ? (
+            <div className="text-center my-5">
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <Table striped bordered hover responsive className="text-center">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Cédula</th>
+                  <th>Correo</th>
+                  <th>Teléfono</th>
+                  <th>Dirección</th>
+                  <th>Rol</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {empleados.map((empleado) => (
+                  <tr key={empleado.id_empleado}>
+                    <td>{empleado.id_empleado}</td>
+                    <td>{empleado.nombre}</td>
+                    <td>{empleado.apellido}</td>
+                    <td>{empleado.cedula}</td>
+                    <td>{empleado.correo}</td>
+                    <td>{empleado.telefono}</td>
+                    <td>{empleado.direccion}</td>
+                    <td>{empleado.id_rol}</td>
+                    <td>
+                      <Button variant="warning" size="sm" className="me-2">
+                        Editar
+                      </Button>
+                      <Button variant="danger" size="sm">
+                        Eliminar
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
         </Col>
       </Row>
     </Container>
