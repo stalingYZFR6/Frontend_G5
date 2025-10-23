@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import TablaUsuarios from "../components/Usuarios/TablaUsuarios";
+import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
 
 const Usuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
+    const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
     const [cargando, setCargando] = useState(true);
+    const [textoBusqueda, setTextoBusqueda] = useState("");
 
     const obtenerUsuarios = async () => {
         try {
@@ -13,11 +16,27 @@ const Usuarios = () => {
 
             const datos = await respuesta.json();
             setUsuarios(datos);
+            setUsuariosFiltrados(datos);
             setCargando(false);
         } catch (error) {
             console.log(error.message);
             setCargando(false);
         }
+    };
+    const manejarCambioBusqueda = (e) => {
+        const texto = e.target.value.toLowerCase();
+        setTextoBusqueda(texto);
+
+        const filtrados = usuarios.filter(
+            (usuario) =>
+                usuario.id_usuario.toString().includes(texto) ||
+                (usuario.nombre && usuario.nombre.toLowerCase().includes(texto)) ||
+                (usuario.apellido && usuario.apellido.toLowerCase().includes(texto)) ||
+                (usuario.correo && usuario.correo.toLowerCase().includes(texto)) ||
+                (usuario.usuario && usuario.usuario.toLowerCase().includes(texto)) ||
+                (usuario.rol && usuario.rol.toLowerCase().includes(texto))
+        );
+        setUsuariosFiltrados(filtrados);
     };
 
     useEffect(() => {
@@ -26,6 +45,15 @@ const Usuarios = () => {
 
     return (
         <Container className="mt-5">
+
+            <Row>
+                <Col lg={5} md={8} sm={8} xs={7}>
+                    <CuadroBusquedas
+                        textoBusqueda={textoBusqueda}
+                        manejarCambioBusqueda={manejarCambioBusqueda}
+                    />
+                </Col>
+            </Row>
             {/* Sección principal con título y descripción */}
             <Row className="align-items-center text-center text-md-start mb-4">
                 <Col>
@@ -43,7 +71,7 @@ const Usuarios = () => {
             <Row>
                 <Col>
                     <TablaUsuarios
-                        usuarios={usuarios}
+                        usuarios={usuariosFiltrados}
                         cargando={cargando}
                     />
                 </Col>
