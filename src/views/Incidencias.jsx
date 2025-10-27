@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import TablaIncidencias from "../components/Incidencias/TablaIncidencias";
 import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
@@ -30,12 +30,11 @@ const Incidencias = () => {
 
     const filtradas = incidencias.filter(
       (incidencia) =>
-        incidencia.id_incidencia.toString().includes(texto) ||
-        (incidencia.descripcion && incidencia.descripcion.toLowerCase().includes(texto)) ||
-        (incidencia.tipo && incidencia.tipo.toLowerCase().includes(texto)) ||
-        (incidencia.estado && incidencia.estado.toLowerCase().includes(texto)) ||
-        (incidencia.fecha && incidencia.fecha.toLowerCase().includes(texto)) ||
-        (incidencia.id_empleado && incidencia.id_empleado.toString().includes(texto))
+        incidencia.tipo_incidencia.toLowerCase().includes(texto) ||
+        (incidencia.descripcion &&
+          incidencia.descripcion.toLowerCase().includes(texto)) ||
+        incidencia.fecha_incidencia.toLowerCase().includes(texto) ||
+        incidencia.id_empleado.toString().includes(texto)
     );
     setIncidenciasFiltradas(filtradas);
   };
@@ -61,7 +60,7 @@ const Incidencias = () => {
         <Col>
           <h1 className="display-4 fw-bold text-primary">Gestión de Incidencias</h1>
           <p className="lead text-secondary">
-            Visualiza y administra las incidencias de manera sencilla.
+            Visualiza y administra las incidencias de los empleados fácilmente.
           </p>
           <Button variant="primary" size="lg">
             Agregar Nueva Incidencia
@@ -69,10 +68,7 @@ const Incidencias = () => {
         </Col>
       </Row>
 
-      <TablaIncidencias
-        incidencias={incidenciasFiltradas}
-        cargando={cargando}
-      />
+      <TablaIncidencias incidencias={incidenciasFiltradas} cargando={cargando} />
     </Container>
   );
 };

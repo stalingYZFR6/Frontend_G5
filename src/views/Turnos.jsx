@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import TablaTurnos from "../components/Turnos/TablaTurnos";
+import TablaIncidencias from "../components/Incidencias/TablaIncidencias";
 import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
 
-const Turnos = () => {
-  const [turnos, setTurnos] = useState([]);
-  const [turnosFiltrados, setTurnosFiltrados] = useState([]);
+const Incidencias = () => {
+  const [incidencias, setIncidencias] = useState([]);
+  const [incidenciasFiltradas, setIncidenciasFiltradas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [textoBusqueda, setTextoBusqueda] = useState("");
 
-  const obtenerTurnos = async () => {
+  const obtenerIncidencias = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/turnos");
-      if (!respuesta.ok) throw new Error("Error al obtener los turnos");
+      const respuesta = await fetch("http://localhost:3000/api/incidencias");
+      if (!respuesta.ok) throw new Error("Error al obtener las incidencias");
 
       const datos = await respuesta.json();
-      setTurnos(datos);
-      setTurnosFiltrados(datos);
+      setIncidencias(datos);
+      setIncidenciasFiltradas(datos);
       setCargando(false);
     } catch (error) {
       console.log(error.message);
@@ -28,19 +28,19 @@ const Turnos = () => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
 
-    const filtrados = turnos.filter(
-      (turno) =>
-        turno.id_turno.toString().includes(texto) ||
-        (turno.nombre && turno.nombre.toLowerCase().includes(texto)) ||
-        (turno.hora_inicio && turno.hora_inicio.toLowerCase().includes(texto)) ||
-        (turno.hora_fin && turno.hora_fin.toLowerCase().includes(texto)) ||
-        (turno.descripcion && turno.descripcion.toLowerCase().includes(texto))
+    const filtradas = incidencias.filter(
+      (incidencia) =>
+        incidencia.tipo_incidencia.toLowerCase().includes(texto) ||
+        (incidencia.descripcion &&
+          incidencia.descripcion.toLowerCase().includes(texto)) ||
+        incidencia.fecha_incidencia.toLowerCase().includes(texto) ||
+        incidencia.id_empleado.toString().includes(texto)
     );
-    setTurnosFiltrados(filtrados);
+    setIncidenciasFiltradas(filtradas);
   };
 
   useEffect(() => {
-    obtenerTurnos();
+    obtenerIncidencias();
   }, []);
 
   return (
@@ -58,22 +58,19 @@ const Turnos = () => {
       {/* Sección principal con título y descripción */}
       <Row className="align-items-center text-center text-md-start mb-4">
         <Col>
-          <h1 className="display-4 fw-bold text-primary">Gestión de Turnos</h1>
+          <h1 className="display-4 fw-bold text-primary">Gestión de Incidencias</h1>
           <p className="lead text-secondary">
-            Visualiza y administra los turnos de trabajo registrados en el sistema.
+            Visualiza y administra las incidencias de los empleados fácilmente.
           </p>
           <Button variant="primary" size="lg">
-            Agregar Nuevo Turno
+            Agregar Nueva Incidencia
           </Button>
         </Col>
       </Row>
 
-      <TablaTurnos
-        turnos={turnosFiltrados}
-        cargando={cargando}
-      />
+      <TablaIncidencias incidencias={incidenciasFiltradas} cargando={cargando} />
     </Container>
   );
 };
 
-export default Turnos;
+export default Incidencias;
