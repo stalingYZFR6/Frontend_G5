@@ -1,6 +1,6 @@
 import { Table, Spinner, Button } from "react-bootstrap";
 
-const TablaTurnos = ({ turnos, cargando }) => {
+const TablaTurnos = ({ turnos, cargando, setMostrarModalEditar, setMostrarModalEliminar, setTurnoSeleccionado }) => {
     if (cargando) {
         return (
             <div className="text-center my-5">
@@ -20,7 +20,7 @@ const TablaTurnos = ({ turnos, cargando }) => {
                     <th>Fecha</th>
                     <th>Hora Inicio</th>
                     <th>Hora Fin</th>
-                    <th>Tipo de Turno</th>
+                    <th>Tipo Turno</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -34,8 +34,12 @@ const TablaTurnos = ({ turnos, cargando }) => {
                         <td>{turno.hora_fin}</td>
                         <td>{turno.tipo_turno}</td>
                         <td>
-                            <Button variant="warning" size="sm" className="me-2">Editar</Button>
-                            <Button variant="danger" size="sm">Eliminar</Button>
+                            <Button variant="warning" size="sm" className="me-2"
+                                onClick={() => { setTurnoSeleccionado(turno); setMostrarModalEditar(true); }}
+                            >Editar</Button>
+                            <Button variant="danger" size="sm"
+                                onClick={() => { setTurnoSeleccionado(turno); setMostrarModalEliminar(true); }}
+                            >Eliminar</Button>
                         </td>
                     </tr>
                 ))}

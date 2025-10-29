@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import TablaIncidencias from "../components/Incidencias/TablaIncidencias";
+import TablaTurnos from "../components/Turnos/TablaTurnos";
 import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
 import ModalRegistroTurno from "../components/Turnos/ModalRegistroTurno";
+import ModalEditarTurno from "../components/Turnos/ModalEditarTurno";
+import ModalEliminarTurno from "../components/Turnos/ModalEliminarTurno";
 
-const Incidencias = () => {
-  const [incidencias, setIncidencias] = useState([]);
-  const [incidenciasFiltradas, setIncidenciasFiltradas] = useState([]);
-  
+const Turnos = () => {
+  const [turnos, setTurnos] = useState([]);
+  const [turnosFiltrados, setTurnosFiltrados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [textoBusqueda, setTextoBusqueda] = useState("");
 
-  const [mostrarModal, setMostrarModal] = useState(false);
+  const [empleados, setEmpleados] = useState([]);
+  const [mostrarModalAgregar, setMostrarModalAgregar] = useState(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
+
   const [nuevoTurno, setNuevoTurno] = useState({
     id_empleado: "",
     fecha: "",
@@ -20,6 +25,40 @@ const Incidencias = () => {
     tipo_turno: ""
   });
 
+  const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
+
+  // Obtener empleados para combo
+  const obtenerEmpleados = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/empleados");
+      if (!res.ok) throw new Error("Error al obtener empleados");
+      const data = await res.json();
+      setEmpleados(data);
+    } catch (error) {
+      console.error("Error al cargar empleados:", error);
+    }
+  };
+
+  // Obtener turnos
+  const obtenerTurnos = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/turnos");
+      if (!res.ok) throw new Error("Error al obtener turnos");
+      const data = await res.json();
+      setTurnos(data);
+      setTurnosFiltrados(data);
+      setCargando(false);
+    } catch (error) {
+      console.error("Error al cargar turnos:", error);
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerEmpleados();
+    obtenerTurnos();
+  }, []);
+
   const manejarCambioInput = (e) => {
     const { name, value } = e.target;
     setNuevoTurno(prev => ({ ...prev, [name]: value }));
@@ -27,26 +66,16 @@ const Incidencias = () => {
 
   const agregarTurno = async () => {
     if (!nuevoTurno.id_empleado || !nuevoTurno.fecha || !nuevoTurno.hora_inicio || !nuevoTurno.hora_fin || !nuevoTurno.tipo_turno) return;
-
     try {
-      const respuesta = await fetch("http://localhost:3000/api/turnos", {
+      const res = await fetch("http://localhost:3000/api/turnos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoTurno)
       });
+      if (!res.ok) throw new Error("Error al guardar el turno");
 
-      if (!respuesta.ok) throw new Error("Error al guardar el turno");
-
-      setNuevoTurno({
-        id_empleado: "",
-        fecha: "",
-        hora_inicio: "",
-        hora_fin: "",
-        tipo_turno: ""
-      });
-      setMostrarModal(false);
-
-      // Refrescar lista de turnos si tienes función
+      setNuevoTurno({ id_empleado: "", fecha: "", hora_inicio: "", hora_fin: "", tipo_turno: "" });
+      setMostrarModalAgregar(false);
       await obtenerTurnos();
     } catch (error) {
       console.error("Error al agregar turno:", error);
@@ -54,44 +83,26 @@ const Incidencias = () => {
     }
   };
 
-  const obtenerIncidencias = async () => {
-    try {
-      const respuesta = await fetch("http://localhost:3000/api/incidencias");
-      if (!respuesta.ok) throw new Error("Error al obtener las incidencias");
-
-      const datos = await respuesta.json();
-      setIncidencias(datos);
-      setIncidenciasFiltradas(datos);
-      setCargando(false);
-    } catch (error) {
-      console.log(error.message);
-      setCargando(false);
-    }
-  };
-
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
 
-    const filtradas = incidencias.filter(
-      (incidencia) =>
-        incidencia.tipo_incidencia.toLowerCase().includes(texto) ||
-        (incidencia.descripcion &&
-          incidencia.descripcion.toLowerCase().includes(texto)) ||
-        incidencia.fecha_incidencia.toLowerCase().includes(texto) ||
-        incidencia.id_empleado.toString().includes(texto)
+    const filtrados = turnos.filter(
+      (turno) =>
+        turno.tipo_turno.toLowerCase().includes(texto) ||
+        turno.fecha.includes(texto) ||
+        turno.hora_inicio.includes(texto) ||
+        turno.hora_fin.includes(texto) ||
+        turno.id_empleado.toString().includes(texto) ||
+        (turno.nombre_empleado && turno.nombre_empleado.toLowerCase().includes(texto))
     );
-    setIncidenciasFiltradas(filtradas);
+    setTurnosFiltrados(filtrados);
   };
-
-  useEffect(() => {
-    obtenerIncidencias();
-  }, []);
 
   return (
     <Container className="mt-5">
 
-      <Row>
+      <Row className="mb-3">
         <Col lg={5} md={8} sm={8} xs={7}>
           <CuadroBusquedas
             textoBusqueda={textoBusqueda}
@@ -100,39 +111,64 @@ const Incidencias = () => {
         </Col>
       </Row>
 
-      {/* Sección principal con título y descripción */}
       <Row className="align-items-center text-center text-md-start mb-4">
         <Col>
-          <h1 className="display-4 fw-bold text-primary">Gestión de Incidencias</h1>
+          <h1 className="display-4 fw-bold text-primary">Gestión de Turnos</h1>
           <p className="lead text-secondary">
-            Visualiza y administra las incidencias de los empleados fácilmente.
+            Visualiza y administra los turnos de los empleados fácilmente.
           </p>
-          <Button variant="primary" size="lg">
-            Agregar Nueva Incidencia
-          </Button>
         </Col>
 
         <Col className="text-end">
           <Button
             className="color-boton-registro"
-            onClick={() => setMostrarModal(true)}
+            onClick={() => setMostrarModalAgregar(true)}
           >
-            + Nuevo Turno
+            + Agregar Turno
           </Button>
         </Col>
       </Row>
 
-      <TablaIncidencias incidencias={incidenciasFiltradas} cargando={cargando} />
+      <TablaTurnos
+        turnos={turnosFiltrados}
+        cargando={cargando}
+        setMostrarModalEditar={setMostrarModalEditar}
+        setMostrarModalEliminar={setMostrarModalEliminar}
+        setTurnoSeleccionado={setTurnoSeleccionado}
+      />
 
       <ModalRegistroTurno
-        mostrarModal={mostrarModal}
-        setMostrarModal={setMostrarModal}
+        mostrarModal={mostrarModalAgregar}
+        setMostrarModal={setMostrarModalAgregar}
         nuevoTurno={nuevoTurno}
         manejarCambioInput={manejarCambioInput}
         agregarTurno={agregarTurno}
+        empleados={empleados}
       />
+
+      {turnoSeleccionado && (
+        <>
+          <ModalEditarTurno
+            mostrarModal={mostrarModalEditar}
+            setMostrarModal={setMostrarModalEditar}
+            turnoSeleccionado={turnoSeleccionado}
+            setTurnoSeleccionado={setTurnoSeleccionado}
+            empleados={empleados}
+            obtenerTurnos={obtenerTurnos}
+          />
+
+          <ModalEliminarTurno
+            mostrarModal={mostrarModalEliminar}
+            setMostrarModal={setMostrarModalEliminar}
+            turnoSeleccionado={turnoSeleccionado}
+            setTurnoSeleccionado={setTurnoSeleccionado}
+            obtenerTurnos={obtenerTurnos}
+          />
+        </>
+      )}
+
     </Container>
   );
 };
 
-export default Incidencias;
+export default Turnos;

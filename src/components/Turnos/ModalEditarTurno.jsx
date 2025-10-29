@@ -1,26 +1,27 @@
 import { Modal, Form, Button } from "react-bootstrap";
 
-const ModalRegistroTurno = ({
+const ModalEditarTurno = ({
     mostrarModal,
     setMostrarModal,
-    nuevoTurno,
+    turnoSeleccionado,
     manejarCambioInput,
-    agregarTurno,
-    empleados // <<< agregamos la lista de empleados como prop
+    editarTurno,
+    empleados
 }) => {
+    if (!turnoSeleccionado) return null;
+
     return (
-        <Modal backdrop='static' show={mostrarModal} onHide={() => setMostrarModal(false)} centered>
+        <Modal show={mostrarModal} onHide={() => setMostrarModal(false)} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Agregar Nuevo Turno</Modal.Title>
+                <Modal.Title>Editar Turno</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    {/* /// Cambio: Combobox para seleccionar empleado */}
                     <Form.Group className="mb-3" controlId="empleado">
                         <Form.Label>Empleado</Form.Label>
                         <Form.Select
                             name="id_empleado"
-                            value={nuevoTurno.id_empleado}
+                            value={turnoSeleccionado.id_empleado}
                             onChange={manejarCambioInput}
                             required
                         >
@@ -38,7 +39,7 @@ const ModalRegistroTurno = ({
                         <Form.Control
                             type="date"
                             name="fecha"
-                            value={nuevoTurno.fecha}
+                            value={turnoSeleccionado.fecha}
                             onChange={manejarCambioInput}
                             required
                         />
@@ -49,7 +50,7 @@ const ModalRegistroTurno = ({
                         <Form.Control
                             type="time"
                             name="hora_inicio"
-                            value={nuevoTurno.hora_inicio}
+                            value={turnoSeleccionado.hora_inicio}
                             onChange={manejarCambioInput}
                             required
                         />
@@ -60,7 +61,7 @@ const ModalRegistroTurno = ({
                         <Form.Control
                             type="time"
                             name="hora_fin"
-                            value={nuevoTurno.hora_fin}
+                            value={turnoSeleccionado.hora_fin}
                             onChange={manejarCambioInput}
                             required
                         />
@@ -70,7 +71,7 @@ const ModalRegistroTurno = ({
                         <Form.Label>Tipo de Turno</Form.Label>
                         <Form.Select
                             name="tipo_turno"
-                            value={nuevoTurno.tipo_turno}
+                            value={turnoSeleccionado.tipo_turno}
                             onChange={manejarCambioInput}
                             required
                         >
@@ -84,20 +85,22 @@ const ModalRegistroTurno = ({
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={() => setMostrarModal(false)}>
+                <Button variant="secondary" type="button" onClick={() => setMostrarModal(false)}>
                     Cancelar
                 </Button>
                 <Button
                     variant="primary"
-                    onClick={agregarTurno}
-                    disabled={!nuevoTurno.id_empleado || !nuevoTurno.fecha || !nuevoTurno.hora_inicio || !nuevoTurno.hora_fin || !nuevoTurno.tipo_turno}
+                    type="button"
+                    onClick={() => {
+                        editarTurno(turnoSeleccionado.id_turno);
+                        setMostrarModal(false);
+                    }}
                 >
-                    Guardar Turno
+                    Guardar cambios
                 </Button>
             </Modal.Footer>
         </Modal>
     );
 };
 
-export default ModalRegistroTurno;
-
+export default ModalEditarTurno;
