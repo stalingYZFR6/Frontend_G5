@@ -201,7 +201,7 @@ const Empleados = () => {
       <ModalRegistroEmpleado
         mostrarModal={mostrarModalRegistro}
         setMostrarModal={setMostrarModalRegistro}
-        agregarEmpleado={crearEmpleado}
+        crearEmpleado={crearEmpleado}
         roles={roles}
       />
 
