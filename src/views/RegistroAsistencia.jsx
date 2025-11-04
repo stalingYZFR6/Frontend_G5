@@ -28,47 +28,46 @@ const RegistroAsistencia = () => {
   const [empleados, setEmpleados] = useState([]);
   const [turnos, setTurnos] = useState([]);
 
-  // Obtener registros de asistencia
+  // Obtener registros
   const obtenerRegistros = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/registroasistencia");
-      if (!respuesta.ok) throw new Error("Error al obtener los registros de asistencia");
-
+      if (!respuesta.ok) throw new Error("Error al obtener registros de asistencia");
       const datos = await respuesta.json();
       setRegistros(datos);
       setRegistrosFiltrados(datos);
       setCargando(false);
     } catch (error) {
-      console.log(error.message);
+      console.error(error);
       setCargando(false);
     }
   };
 
-  // Obtener empleados para el combobox del modal
+  // Obtener empleados
   const obtenerEmpleados = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/empleados");
-      if (!respuesta.ok) throw new Error("Error al obtener los empleados");
+      if (!respuesta.ok) throw new Error("Error al obtener empleados");
       const datos = await respuesta.json();
       setEmpleados(datos);
     } catch (error) {
-      console.log(error.message);
+      console.error(error);
     }
   };
 
-  // Obtener turnos para el combobox del modal
+  // Obtener turnos
   const obtenerTurnos = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/turnos");
-      if (!respuesta.ok) throw new Error("Error al obtener los turnos");
+      if (!respuesta.ok) throw new Error("Error al obtener turnos");
       const datos = await respuesta.json();
       setTurnos(datos);
     } catch (error) {
-      console.log(error.message);
+      console.error(error);
     }
   };
 
-  // Manejar cambios en inputs del modal de agregar o editar
+  // Manejar cambios en inputs
   const manejarCambioInput = (e) => {
     const { name, value } = e.target;
     if (asistenciaSeleccionada) {
@@ -89,7 +88,7 @@ const RegistroAsistencia = () => {
         body: JSON.stringify(nuevoRegistro),
       });
 
-      if (!respuesta.ok) throw new Error("Error al guardar el registro de asistencia");
+      if (!respuesta.ok) throw new Error("Error al guardar registro de asistencia");
 
       setNuevoRegistro({
         id_empleado: "",
@@ -106,13 +105,15 @@ const RegistroAsistencia = () => {
     }
   };
 
+  // Editar registro
   const editarAsistencia = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, {
+      const res = await fetch(`http://localhost:3000/api/registroAsistencia/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_empleado: asistenciaSeleccionada.id_empleado,
+          id_turno: asistenciaSeleccionada.id_turno,
           fecha: asistenciaSeleccionada.fecha,
           hora_entrada: asistenciaSeleccionada.hora_entrada,
           hora_salida: asistenciaSeleccionada.hora_salida
@@ -133,12 +134,10 @@ const RegistroAsistencia = () => {
     }
   };
 
-
+  // Eliminar registro
   const eliminarAsistencia = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Error al eliminar registro de asistencia");
 
       setMostrarModalEliminar(false);
@@ -150,21 +149,22 @@ const RegistroAsistencia = () => {
     }
   };
 
-  // Manejar búsqueda
+  // Buscar registros
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
 
     const filtrados = registros.filter(
-      (registro) =>
+      registro =>
         registro.id_registro.toString().includes(texto) ||
-        (registro.id_empleado && registro.id_empleado.toString().includes(texto)) ||
-        (registro.id_turno && registro.id_turno.toString().includes(texto)) ||
-        (registro.fecha && registro.fecha.toLowerCase().includes(texto)) ||
-        (registro.hora_entrada && registro.hora_entrada.toLowerCase().includes(texto)) ||
-        (registro.hora_salida && registro.hora_salida.toLowerCase().includes(texto)) ||
-        (registro.horas_trabajadas && registro.horas_trabajadas.toString().includes(texto))
+        registro.id_empleado?.toString().includes(texto) ||
+        registro.id_turno?.toString().includes(texto) ||
+        registro.fecha?.toLowerCase().includes(texto) ||
+        registro.hora_entrada?.toLowerCase().includes(texto) ||
+        registro.hora_salida?.toLowerCase().includes(texto) ||
+        registro.horas_trabajadas?.toString().includes(texto)
     );
+
     setRegistrosFiltrados(filtrados);
   };
 
@@ -176,7 +176,6 @@ const RegistroAsistencia = () => {
 
   return (
     <Container className="mt-5">
-      {/* Cuadro de búsqueda */}
       <Row>
         <Col lg={5} md={8} sm={8} xs={7}>
           <CuadroBusquedas
@@ -185,16 +184,12 @@ const RegistroAsistencia = () => {
           />
         </Col>
         <Col className="text-end">
-          <Button
-            className="color-boton-registro"
-            onClick={() => setMostrarModal(true)}
-          >
+          <Button className="color-boton-registro" onClick={() => setMostrarModal(true)}>
             + Nuevo Registro
           </Button>
         </Col>
       </Row>
 
-      {/* Encabezado principal */}
       <Row className="align-items-center text-center text-md-start mb-4">
         <Col>
           <h1 className="display-4 fw-bold text-primary">Registro de Asistencia</h1>
@@ -204,7 +199,7 @@ const RegistroAsistencia = () => {
         </Col>
       </Row>
 
-      {/* Tabla con datos */}
+      {/* Tabla */}
       <TablaRegistroAsistencia
         registros={registrosFiltrados}
         cargando={cargando}
@@ -213,7 +208,7 @@ const RegistroAsistencia = () => {
         setAsistenciaSeleccionada={setAsistenciaSeleccionada}
       />
 
-      {/* Modal para agregar nuevo registro */}
+      {/* Modal Agregar */}
       <ModalRegistroAsistencia
         mostrarModal={mostrarModal}
         setMostrarModal={setMostrarModal}
@@ -232,10 +227,13 @@ const RegistroAsistencia = () => {
           asistenciaSeleccionada={asistenciaSeleccionada}
           manejarCambioInput={manejarCambioInput}
           editarAsistencia={editarAsistencia}
+          empleados={empleados}   // <-- Se pasan los empleados
+          turnos={turnos}         // <-- Se pasan los turnos
         />
       )}
 
-      {/* Modal para eliminar */}
+
+      {/* Modal Eliminar */}
       {asistenciaSeleccionada && (
         <ModalEliminarAsistencia
           mostrarModal={mostrarModalEliminar}

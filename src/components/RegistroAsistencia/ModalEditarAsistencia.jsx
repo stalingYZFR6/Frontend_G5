@@ -5,7 +5,9 @@ const ModalEditarAsistencia = ({
     setMostrarModal,
     asistenciaSeleccionada,
     manejarCambioInput,
-    editarAsistencia
+    editarAsistencia,
+    empleados = [],
+    turnos = []
 }) => {
     if (!asistenciaSeleccionada) return null;
 
@@ -16,23 +18,75 @@ const ModalEditarAsistencia = ({
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    <Form.Group className="mb-3" controlId="horaEntrada">
-                        <Form.Label>Hora de Entrada</Form.Label>
+                    {/* Selección de empleado */}
+                    <Form.Group className="mb-3" controlId="id_empleado">
+                        <Form.Label>Empleado</Form.Label>
                         <Form.Control
-                            type="time"
-                            name="hora_entrada"
-                            value={asistenciaSeleccionada.hora_entrada}
+                            as="select"
+                            name="id_empleado"
+                            value={asistenciaSeleccionada.id_empleado}
+                            onChange={manejarCambioInput}
+                            required
+                        >
+                            <option value="">-- Seleccione empleado --</option>
+                            {empleados.map(emp => (
+                                <option key={emp.id_empleado} value={emp.id_empleado}>
+                                    {emp.nombre} {emp.apellido}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+
+                    {/* Selección de turno */}
+                    <Form.Group className="mb-3" controlId="id_turno">
+                        <Form.Label>Turno</Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="id_turno"
+                            value={asistenciaSeleccionada.id_turno}
+                            onChange={manejarCambioInput}
+                            required
+                        >
+                            <option value="">-- Seleccione turno --</option>
+                            {turnos.map(turno => (
+                                <option key={turno.id_turno} value={turno.id_turno}>
+                                    {turno.tipo_turno} ({turno.hora_inicio} - {turno.hora_fin})
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+
+                    {/* Fecha */}
+                    <Form.Group className="mb-3" controlId="fecha">
+                        <Form.Label>Fecha</Form.Label>
+                        <Form.Control
+                            type="date"
+                            name="fecha"
+                            value={asistenciaSeleccionada.fecha.split('T')[0]}
                             onChange={manejarCambioInput}
                             required
                         />
                     </Form.Group>
 
-                    <Form.Group className="mb-3" controlId="horaSalida">
+                    {/* Hora entrada */}
+                    <Form.Group className="mb-3" controlId="hora_entrada">
+                        <Form.Label>Hora de Entrada</Form.Label>
+                        <Form.Control
+                            type="time"
+                            name="hora_entrada"
+                            value={asistenciaSeleccionada.hora_entrada || ""}
+                            onChange={manejarCambioInput}
+                            required
+                        />
+                    </Form.Group>
+
+                    {/* Hora salida */}
+                    <Form.Group className="mb-3" controlId="hora_salida">
                         <Form.Label>Hora de Salida</Form.Label>
                         <Form.Control
                             type="time"
                             name="hora_salida"
-                            value={asistenciaSeleccionada.hora_salida}
+                            value={asistenciaSeleccionada.hora_salida || ""}
                             onChange={manejarCambioInput}
                             required
                         />
@@ -46,10 +100,7 @@ const ModalEditarAsistencia = ({
                 <Button
                     variant="primary"
                     type="button"
-                    onClick={() => {
-                        editarAsistencia(asistenciaSeleccionada.id_registro);
-                        setMostrarModal(false);
-                    }}
+                    onClick={() => editarAsistencia(asistenciaSeleccionada.id_registro)}
                 >
                     Guardar cambios
                 </Button>
