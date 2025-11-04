@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import TablaRegistroAsistencia from "../components/RegistroAsistencia/TablaRegistroAsistencia";
 import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
 import ModalRegistroAsistencia from "../components/RegistroAsistencia/ModalRegistroAsistencia";
+import ModalEditarAsistencia from "../components/RegistroAsistencia/ModalEditarAsistencia";
+import ModalEliminarAsistencia from "../components/RegistroAsistencia/ModalEliminarAsistencia";
 
 const RegistroAsistencia = () => {
   const [registros, setRegistros] = useState([]);
@@ -11,6 +13,9 @@ const RegistroAsistencia = () => {
   const [textoBusqueda, setTextoBusqueda] = useState("");
 
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
+
   const [nuevoRegistro, setNuevoRegistro] = useState({
     id_empleado: "",
     id_turno: "",
@@ -19,6 +24,7 @@ const RegistroAsistencia = () => {
     hora_salida: "",
   });
 
+  const [asistenciaSeleccionada, setAsistenciaSeleccionada] = useState(null);
   const [empleados, setEmpleados] = useState([]);
   const [turnos, setTurnos] = useState([]);
 
@@ -62,10 +68,14 @@ const RegistroAsistencia = () => {
     }
   };
 
-  // Manejar cambios en inputs del modal
+  // Manejar cambios en inputs del modal de agregar o editar
   const manejarCambioInput = (e) => {
     const { name, value } = e.target;
-    setNuevoRegistro(prev => ({ ...prev, [name]: value }));
+    if (asistenciaSeleccionada) {
+      setAsistenciaSeleccionada(prev => ({ ...prev, [name]: value }));
+    } else {
+      setNuevoRegistro(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Agregar nuevo registro
@@ -96,6 +106,50 @@ const RegistroAsistencia = () => {
     }
   };
 
+  const editarAsistencia = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id_empleado: asistenciaSeleccionada.id_empleado,
+          fecha: asistenciaSeleccionada.fecha,
+          hora_entrada: asistenciaSeleccionada.hora_entrada,
+          hora_salida: asistenciaSeleccionada.hora_salida
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data?.message || "Error al editar registro de asistencia");
+      }
+
+      setMostrarModalEditar(false);
+      setAsistenciaSeleccionada(null);
+      await obtenerRegistros();
+    } catch (error) {
+      console.error("Error al editar registro:", error);
+      alert(error.message);
+    }
+  };
+
+
+  const eliminarAsistencia = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Error al eliminar registro de asistencia");
+
+      setMostrarModalEliminar(false);
+      setAsistenciaSeleccionada(null);
+      await obtenerRegistros();
+    } catch (error) {
+      console.error("Error al eliminar registro:", error);
+      alert("No se pudo eliminar el registro.");
+    }
+  };
+
   // Manejar búsqueda
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
@@ -122,7 +176,6 @@ const RegistroAsistencia = () => {
 
   return (
     <Container className="mt-5">
-
       {/* Cuadro de búsqueda */}
       <Row>
         <Col lg={5} md={8} sm={8} xs={7}>
@@ -155,6 +208,9 @@ const RegistroAsistencia = () => {
       <TablaRegistroAsistencia
         registros={registrosFiltrados}
         cargando={cargando}
+        setMostrarModalEditar={setMostrarModalEditar}
+        setMostrarModalEliminar={setMostrarModalEliminar}
+        setAsistenciaSeleccionada={setAsistenciaSeleccionada}
       />
 
       {/* Modal para agregar nuevo registro */}
@@ -167,6 +223,27 @@ const RegistroAsistencia = () => {
         empleados={empleados}
         turnos={turnos}
       />
+
+      {/* Modal para editar */}
+      {asistenciaSeleccionada && (
+        <ModalEditarAsistencia
+          mostrarModal={mostrarModalEditar}
+          setMostrarModal={setMostrarModalEditar}
+          asistenciaSeleccionada={asistenciaSeleccionada}
+          manejarCambioInput={manejarCambioInput}
+          editarAsistencia={editarAsistencia}
+        />
+      )}
+
+      {/* Modal para eliminar */}
+      {asistenciaSeleccionada && (
+        <ModalEliminarAsistencia
+          mostrarModal={mostrarModalEliminar}
+          setMostrarModal={setMostrarModalEliminar}
+          asistenciaSeleccionada={asistenciaSeleccionada}
+          eliminarAsistencia={eliminarAsistencia}
+        />
+      )}
     </Container>
   );
 };

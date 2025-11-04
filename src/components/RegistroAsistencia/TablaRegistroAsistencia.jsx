@@ -1,6 +1,12 @@
 import { Table, Spinner, Button } from "react-bootstrap";
 
-const TablaRegistroAsistencia = ({ registros, cargando }) => {
+const TablaRegistroAsistencia = ({
+    registros,
+    cargando,
+    setMostrarModalEditar,
+    setMostrarModalEliminar,
+    setAsistenciaSeleccionada // <-- aquí el nombre coincide con tu padre
+}) => {
     if (cargando) {
         return (
             <div className="text-center my-5">
@@ -36,8 +42,27 @@ const TablaRegistroAsistencia = ({ registros, cargando }) => {
                         <td>{registro.hora_salida}</td>
                         <td>{registro.horas_trabajadas}</td>
                         <td>
-                            <Button variant="warning" size="sm" className="me-2">Editar</Button>
-                            <Button variant="danger" size="sm">Eliminar</Button>
+                            <Button
+                                variant="warning"
+                                size="sm"
+                                className="me-2"
+                                onClick={() => {
+                                    setAsistenciaSeleccionada(registro); // <--- usa este nombre
+                                    setMostrarModalEditar(true);
+                                }}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => {
+                                    setAsistenciaSeleccionada(registro); // <--- usa este nombre
+                                    setMostrarModalEliminar(true);
+                                }}
+                            >
+                                Eliminar
+                            </Button>
                         </td>
                     </tr>
                 ))}
