@@ -27,7 +27,7 @@ const Turnos = () => {
 
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
 
-  // Obtener empleados para combo
+  // Obtener empleados
   const obtenerEmpleados = async () => {
     try {
       const res = await fetch("http://localhost:3000/api/empleados");
@@ -83,6 +83,20 @@ const Turnos = () => {
     }
   };
 
+  const eliminarTurno = async (id_turno) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/turnos/${id_turno}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) throw new Error("Error al eliminar el turno");
+      await obtenerTurnos();
+      setMostrarModalEliminar(false);
+    } catch (error) {
+      console.error("No se pudo eliminar el turno:", error);
+      alert("No se pudo eliminar el turno. Revisa la consola.");
+    }
+  };
+
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
@@ -97,6 +111,18 @@ const Turnos = () => {
         (turno.nombre_empleado && turno.nombre_empleado.toLowerCase().includes(texto))
     );
     setTurnosFiltrados(filtrados);
+  };
+
+  // Seleccionar turno para editar
+  const seleccionarTurnoEditar = (turno) => {
+    setTurnoSeleccionado(turno);
+    setMostrarModalEditar(true);
+  };
+
+  // Seleccionar turno para eliminar
+  const seleccionarTurnoEliminar = (turno) => {
+    setTurnoSeleccionado(turno);
+    setMostrarModalEliminar(true);
   };
 
   return (
@@ -132,9 +158,8 @@ const Turnos = () => {
       <TablaTurnos
         turnos={turnosFiltrados}
         cargando={cargando}
-        setMostrarModalEditar={setMostrarModalEditar}
-        setMostrarModalEliminar={setMostrarModalEliminar}
-        setTurnoSeleccionado={setTurnoSeleccionado}
+        seleccionarTurnoEditar={seleccionarTurnoEditar}
+        seleccionarTurnoEliminar={seleccionarTurnoEliminar}
       />
 
       <ModalRegistroTurno
@@ -161,8 +186,7 @@ const Turnos = () => {
             mostrarModal={mostrarModalEliminar}
             setMostrarModal={setMostrarModalEliminar}
             turnoSeleccionado={turnoSeleccionado}
-            setTurnoSeleccionado={setTurnoSeleccionado}
-            obtenerTurnos={obtenerTurnos}
+            eliminarTurno={eliminarTurno}
           />
         </>
       )}
