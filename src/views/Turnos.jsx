@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import TablaTurnos from "../components/Turnos/TablaTurnos";
 import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
 import ModalRegistroTurno from "../components/Turnos/ModalRegistroTurno";
@@ -64,6 +64,7 @@ const Turnos = () => {
     setNuevoTurno(prev => ({ ...prev, [name]: value }));
   };
 
+  // Agregar turno
   const agregarTurno = async () => {
     if (!nuevoTurno.id_empleado || !nuevoTurno.fecha || !nuevoTurno.hora_inicio || !nuevoTurno.hora_fin || !nuevoTurno.tipo_turno) return;
     try {
@@ -83,12 +84,12 @@ const Turnos = () => {
     }
   };
 
+  // Eliminar turno
   const eliminarTurno = async (id_turno) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/turnos/${id_turno}`, {
-        method: "DELETE"
-      });
+      const res = await fetch(`http://localhost:3000/api/turnos/${id_turno}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Error al eliminar el turno");
+
       await obtenerTurnos();
       setMostrarModalEliminar(false);
     } catch (error) {
@@ -97,6 +98,7 @@ const Turnos = () => {
     }
   };
 
+  // Manejar búsqueda
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
@@ -186,7 +188,7 @@ const Turnos = () => {
             mostrarModal={mostrarModalEliminar}
             setMostrarModal={setMostrarModalEliminar}
             turnoSeleccionado={turnoSeleccionado}
-            eliminarTurno={eliminarTurno}
+            eliminarTurno={eliminarTurno} // ✅ importante: pasar la función
           />
         </>
       )}
