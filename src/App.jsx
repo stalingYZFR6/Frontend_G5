@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { ThemeContext } from "./context/ThemeContext.jsx"; // <-- importar el contexto
+
 // Importar componente Encabezado
 import Encabezado from "./components/navegacion/Encabezado";
+
 // Importar las vistas
 import Inicio from "./views/Inicio";
 import Empleados from "./views/Empleados"; 
@@ -10,14 +14,30 @@ import Rol from "./views/Rol";
 import Turnos from "./views/Turnos";
 import Usuarios from "./views/Usuarios";
 
+// Importar botón de modo oscuro
+import BotonTema from "./components/BotonTema.jsx";
+
 // Importar archivo de estilos
 import "./App.css";
 
-
 const App = () => {
+  const { modoOscuro } = useContext(ThemeContext);
+
+  // Aplicar clase al body según el tema
+  useEffect(() => {
+    if (modoOscuro) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [modoOscuro]);
+
   return (
     <Router>
       <Encabezado />
+      <header className="d-flex justify-content-end p-2">
+        <BotonTema />
+      </header>
       <main className="margen-superior-main">
         <Routes>
           <Route path="/" element={<Inicio />} />
@@ -27,7 +47,6 @@ const App = () => {
           <Route path="/rol" element={<Rol />} />
           <Route path="/turnos" element={<Turnos />} />
           <Route path="/usuarios" element={<Usuarios />} />
-          {/* Opcional: ruta para 404 */}
           <Route path="*" element={<h2>Página no encontrada</h2>} />
         </Routes>
       </main>
@@ -36,3 +55,4 @@ const App = () => {
 };
 
 export default App;
+

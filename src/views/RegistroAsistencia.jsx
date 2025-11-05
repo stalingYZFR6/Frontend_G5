@@ -184,11 +184,15 @@ const RegistroAsistencia = () => {
           />
         </Col>
         <Col className="text-end">
-          <Button className="color-boton-registro" onClick={() => setMostrarModal(true)}>
-            + Nuevo Registro
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => setMostrarModal(true)}>
+            Nuevo Registro
           </Button>
         </Col>
       </Row>
+
 
       <Row className="align-items-center text-center text-md-start mb-4">
         <Col>

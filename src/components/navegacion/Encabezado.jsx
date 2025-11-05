@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
+import BotonTema from "../BotonTema.jsx";
+
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -29,6 +31,11 @@ const Encabezado = () => {
         >
           Sistema Gestor De Empleados
         </Navbar.Brand>
+
+
+        <header className="d-flex justify-content-end p-2">
+          <BotonTema />
+        </header>
 
         <Navbar.Toggle
           aria-controls="menu-offcanvas"

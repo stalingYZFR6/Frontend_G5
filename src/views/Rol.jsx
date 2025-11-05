@@ -134,8 +134,11 @@ const Roles = () => {
           </p>
         </Col>
         <Col className="text-end">
-          <Button className="color-boton-registro" onClick={() => setMostrarModalAgregar(true)}>
-            + Nuevo Rol
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => setMostrarModalAgregar(true)}>
+            Nuevo Rol
           </Button>
         </Col>
       </Row>

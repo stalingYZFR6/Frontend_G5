@@ -1,0 +1,99 @@
+/* ===========================
+   Modo oscuro general
+=========================== */
+body.dark-mode {
+    background-color: #121212;
+    color: #f8f9fa;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode a {
+    color: #bb86fc;
+}
+
+/* ===========================
+   Tablas en modo oscuro
+=========================== */
+.table-dark-mode {
+    background-color: #1e1e1e !important;
+    color: #f8f9fa !important;
+    border-color: #444 !important;
+}
+
+.table-dark-mode th,
+.table-dark-mode td {
+    border-color: #444 !important;
+    color: #f8f9fa !important;
+}
+
+.table-dark-mode thead {
+    background-color: #2c2c2c !important;
+}
+
+.table-dark-mode tbody tr:hover {
+    background-color: #333 !important;
+}
+
+/* ===========================
+   Modales
+=========================== */
+.modal-content.dark-mode {
+    background-color: #1e1e1e;
+    color: #f8f9fa;
+    border-color: #444;
+}
+
+.modal-header.dark-mode,
+.modal-footer.dark-mode {
+    background-color: #2c2c2c;
+    color: #f8f9fa;
+    border-color: #444;
+}
+
+/* ===========================
+   Inputs y formularios
+=========================== */
+.form-control.dark-mode {
+    background-color: #2a2a2a;
+    color: #f8f9fa;
+    border-color: #444;
+}
+
+.form-control.dark-mode:focus {
+    background-color: #2a2a2a;
+    color: #f8f9fa;
+    border-color: #888;
+    box-shadow: none;
+}
+
+/* ===========================
+   Navbar / Header
+=========================== */
+.navbar.dark-mode {
+    background-color: #1e1e1e !important;
+    color: #f8f9fa !important;
+    border-bottom: 1px solid #444;
+}
+
+.navbar.dark-mode a {
+    color: #f8f9fa !important;
+}
+
+/* ===========================
+   Otros elementos
+=========================== */
+.card.dark-mode {
+    background-color: #1e1e1e;
+    color: #f8f9fa;
+    border: 1px solid #444;
+}
+
+.card.dark-mode .card-header {
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #444;
+}
+
+.card.dark-mode .card-body {
+    background-color: #1e1e1e;
+    color: #f8f9fa;
+}
