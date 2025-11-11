@@ -1,6 +1,12 @@
-import { Table, Spinner, Button, } from "react-bootstrap";
+import { Table, Spinner, Button } from "react-bootstrap";
 
-const TablaUsuarios = ({ usuarios, cargando, setMostrarModalEditar, setMostrarModalEliminar, setUsuarioSeleccionado }) => {
+const TablaUsuarios = ({
+  usuarios,
+  cargando,
+  setMostrarModalEditar,
+  setMostrarModalEliminar,
+  setUsuarioSeleccionado
+}) => {
   if (cargando) {
     return (
       <div className="text-center my-5">
@@ -30,7 +36,12 @@ const TablaUsuarios = ({ usuarios, cargando, setMostrarModalEditar, setMostrarMo
             <td>{usuario.id_empleado}</td>
             <td>{usuario.login}</td>
             <td>{usuario.rol_aplicacion}</td>
-            <td>{usuario.ultima_actividad}</td>
+            {/* Formatear fecha solo día/mes/año */}
+            <td>
+              {usuario.ultima_actividad
+                ? new Date(usuario.ultima_actividad).toLocaleDateString()
+                : ''}
+            </td>
             <td>
               <Button
                 variant="warning"

@@ -5,7 +5,7 @@ const TablaRegistroAsistencia = ({
     cargando,
     setMostrarModalEditar,
     setMostrarModalEliminar,
-    setAsistenciaSeleccionada // <-- aquí el nombre coincide con tu padre
+    setAsistenciaSeleccionada
 }) => {
     if (cargando) {
         return (
@@ -37,7 +37,12 @@ const TablaRegistroAsistencia = ({
                         <td>{registro.id_registro}</td>
                         <td>{registro.id_empleado}</td>
                         <td>{registro.id_turno}</td>
-                        <td>{registro.fecha}</td>
+                        {/* Fecha solo con día/mes/año */}
+                        <td>
+                            {registro.fecha
+                                ? new Date(registro.fecha).toLocaleDateString()
+                                : ''}
+                        </td>
                         <td>{registro.hora_entrada}</td>
                         <td>{registro.hora_salida}</td>
                         <td>{registro.horas_trabajadas}</td>
@@ -47,7 +52,7 @@ const TablaRegistroAsistencia = ({
                                 size="sm"
                                 className="me-2"
                                 onClick={() => {
-                                    setAsistenciaSeleccionada(registro); // <--- usa este nombre
+                                    setAsistenciaSeleccionada(registro);
                                     setMostrarModalEditar(true);
                                 }}
                             >
@@ -57,7 +62,7 @@ const TablaRegistroAsistencia = ({
                                 variant="danger"
                                 size="sm"
                                 onClick={() => {
-                                    setAsistenciaSeleccionada(registro); // <--- usa este nombre
+                                    setAsistenciaSeleccionada(registro);
                                     setMostrarModalEliminar(true);
                                 }}
                             >

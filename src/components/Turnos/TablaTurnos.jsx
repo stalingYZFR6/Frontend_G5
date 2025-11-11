@@ -29,13 +29,16 @@ const TablaTurnos = ({ turnos, cargando, seleccionarTurnoEditar, seleccionarTurn
           <tr key={turno.id_turno}>
             <td>{turno.id_turno}</td>
             <td>{turno.nombre_empleado} {turno.apellido_empleado}</td>
-            <td>{turno.fecha}</td>
+            {/* Fecha legible sin hora */}
+            <td>
+              {turno.fecha ? new Date(turno.fecha).toLocaleDateString() : ''}
+            </td>
             <td>{turno.hora_inicio}</td>
             <td>{turno.hora_fin}</td>
             <td>{turno.tipo_turno}</td>
             <td>
               <Button
-                variant="outline-warning"
+                variant="warning"
                 size="sm"
                 className="me-2"
                 onClick={() => seleccionarTurnoEditar(turno)}
@@ -43,7 +46,7 @@ const TablaTurnos = ({ turnos, cargando, seleccionarTurnoEditar, seleccionarTurn
                 Editar
               </Button>
               <Button
-                variant="outline-danger"
+                variant="danger"
                 size="sm"
                 onClick={() => seleccionarTurnoEliminar(turno)}
               >
