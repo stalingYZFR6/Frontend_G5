@@ -1,5 +1,5 @@
 import { Modal, Form, Button, Alert } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const ModalRegistroEmpleado = ({
     mostrarModal,
@@ -15,6 +15,7 @@ const ModalRegistroEmpleado = ({
         telefono: "",
         direccion: "",
         id_rol: "",
+        foto: "", // <-- Nuevo campo para la foto en Base64
     });
 
     const [error, setError] = useState("");
@@ -23,6 +24,21 @@ const ModalRegistroEmpleado = ({
     const manejarCambioInput = (e) => {
         const { name, value } = e.target;
         setEmpleadoLocal((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Manejar cambio de la foto
+    const manejarCambioFoto = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEmpleadoLocal(prev => ({
+                    ...prev,
+                    foto: reader.result.split(',')[1] // Solo Base64
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     // Guardar empleado
@@ -47,11 +63,11 @@ const ModalRegistroEmpleado = ({
                 telefono: "",
                 direccion: "",
                 id_rol: "",
+                foto: "",
             });
 
             setMostrarModal(false);
         } catch (err) {
-            // Mostrar el error real del backend
             if (err.message) setError(err.message);
             else setError("Error desconocido al crear el empleado");
         }
@@ -102,7 +118,7 @@ const ModalRegistroEmpleado = ({
                         <Form.Control
                             type="email"
                             name="correo"
-                            value={empleadoLocal.correo}
+                            value={empleadoLocal.correo || ""}
                             onChange={manejarCambioInput}
                         />
                     </Form.Group>
@@ -112,7 +128,7 @@ const ModalRegistroEmpleado = ({
                         <Form.Control
                             type="text"
                             name="telefono"
-                            value={empleadoLocal.telefono}
+                            value={empleadoLocal.telefono || ""}
                             onChange={manejarCambioInput}
                         />
                     </Form.Group>
@@ -122,7 +138,7 @@ const ModalRegistroEmpleado = ({
                         <Form.Control
                             type="text"
                             name="direccion"
-                            value={empleadoLocal.direccion}
+                            value={empleadoLocal.direccion || ""}
                             onChange={manejarCambioInput}
                         />
                     </Form.Group>
@@ -142,6 +158,27 @@ const ModalRegistroEmpleado = ({
                             ))}
                         </Form.Select>
                     </Form.Group>
+
+                    {/* Input para la foto */}
+                    <Form.Group className="mb-3" controlId="formFotoEmpleado">
+                        <Form.Label>Foto</Form.Label>
+                        {empleadoLocal.foto && (
+                            <div>
+                                <img
+                                    src={`data:image/png;base64,${empleadoLocal.foto}`}
+                                    alt="Foto actual"
+                                    style={{ maxWidth: '100px', marginBottom: '10px' }}
+                                />
+                            </div>
+                        )}
+                        <Form.Control
+                            type="file"
+                            name="foto"
+                            accept="image/*"
+                            onChange={manejarCambioFoto}
+                        />
+                    </Form.Group>
+
                 </Form>
             </Modal.Body>
 
@@ -162,3 +199,4 @@ const ModalRegistroEmpleado = ({
 };
 
 export default ModalRegistroEmpleado;
+

@@ -13,6 +13,7 @@ import RegistroAsistencia from "./views/RegistroAsistencia";
 import Rol from "./views/Rol";
 import Turnos from "./views/Turnos";
 import Usuarios from "./views/Usuarios";
+import CatalogoEmpleados from "./views/CatalogoEmpleados.jsx";
 
 // Importar botón de modo oscuro
 import BotonTema from "./components/BotonTema.jsx";
@@ -42,6 +43,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/empleados" element={<Empleados />} />
+          <Route path="/catalogo-empleados" element={<CatalogoEmpleados />} />
           <Route path="/incidencias" element={<Incidencias />} />
           <Route path="/registroAsistencia" element={<RegistroAsistencia />} />
           <Route path="/rol" element={<Rol />} />

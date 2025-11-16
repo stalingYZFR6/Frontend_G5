@@ -16,9 +16,9 @@ const ModalEditarEmpleado = ({
         telefono: "",
         direccion: "",
         id_rol: "",
+        foto: "",
     });
 
-    // Cada vez que cambia el empleado seleccionado, se copia al estado local
     useEffect(() => {
         if (empleadoSeleccionado) {
             setEmpleadoLocal({ ...empleadoSeleccionado });
@@ -28,6 +28,20 @@ const ModalEditarEmpleado = ({
     const manejarCambioInput = (e) => {
         const { name, value } = e.target;
         setEmpleadoLocal((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const manejarCambioFoto = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEmpleadoLocal(prev => ({
+                    ...prev,
+                    foto: reader.result.split(',')[1] // Solo Base64
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleGuardar = async () => {
@@ -121,6 +135,26 @@ const ModalEditarEmpleado = ({
                             ))}
                         </Form.Select>
                     </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formFotoEmpleado">
+                        <Form.Label>Foto</Form.Label>
+                        {empleadoLocal.foto && (
+                            <div>
+                                <img
+                                    src={`data:image/png;base64,${empleadoLocal.foto}`}
+                                    alt="Foto actual"
+                                    style={{ maxWidth: '100px', marginBottom: '10px' }}
+                                />
+                            </div>
+                        )}
+                        <Form.Control
+                            type="file"
+                            name="foto"
+                            accept="image/*"
+                            onChange={manejarCambioFoto}
+                        />
+                    </Form.Group>
+
                 </Form>
             </Modal.Body>
 

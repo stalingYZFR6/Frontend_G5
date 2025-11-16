@@ -22,6 +22,7 @@ const TablaEmpleados = ({
       <thead>
         <tr>
           <th>ID</th>
+          <th>Foto</th> {/* Nueva columna para la foto */}
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Cédula</th>
@@ -36,13 +37,28 @@ const TablaEmpleados = ({
         {empleados.map((empleado) => (
           <tr key={empleado.id_empleado}>
             <td>{empleado.id_empleado}</td>
+
+            {/* Columna para mostrar foto */}
+            <td>
+              {empleado.foto ? (
+                <img
+                  src={`data:image/png;base64,${empleado.foto}`}
+                  alt={`${empleado.nombre} ${empleado.apellido}`}
+                  style={{ maxWidth: "80px", borderRadius: "5px" }}
+                />
+              ) : (
+                "Sin foto"
+              )}
+            </td>
+
             <td>{empleado.nombre}</td>
             <td>{empleado.apellido}</td>
             <td>{empleado.cedula}</td>
-            <td>{empleado.correo}</td>
-            <td>{empleado.telefono}</td>
-            <td>{empleado.direccion}</td>
+            <td>{empleado.correo || "-"}</td>
+            <td>{empleado.telefono || "-"}</td>
+            <td>{empleado.direccion || "-"}</td>
             <td>{empleado.nombre_rol || empleado.id_rol}</td>
+
             <td>
               <Button
                 variant="warning"
@@ -74,4 +90,3 @@ const TablaEmpleados = ({
 };
 
 export default TablaEmpleados;
-

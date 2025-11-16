@@ -69,6 +69,14 @@ const Encabezado = () => {
 
               <Nav.Link
                 className={mostrarMenu ? "texto-marca" : "text-white"}
+                onClick={() => manejarNavegacion("/catalogo-empleados")}
+              >
+                {mostrarMenu ? <i className="bi-card-image me-2"></i> : null} Catálogo Empleados
+              </Nav.Link>
+
+
+              <Nav.Link
+                className={mostrarMenu ? "texto-marca" : "text-white"}
                 onClick={() => manejarNavegacion("/incidencias")}
               >
                 {mostrarMenu ? <i className="bi-exclamation-triangle me-2"></i> : null} Incidencias
