@@ -1,4 +1,4 @@
-import { Table, Spinner, Button } from "react-bootstrap";
+import { Table, Spinner, Button, Image } from "react-bootstrap";
 
 const TablaRegistroAsistencia = ({
     registros,
@@ -22,7 +22,7 @@ const TablaRegistroAsistencia = ({
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>ID Empleado</th>
+                    <th>Empleado</th>
                     <th>ID Turno</th>
                     <th>Fecha</th>
                     <th>Hora Entrada</th>
@@ -35,17 +35,37 @@ const TablaRegistroAsistencia = ({
                 {registros.map((registro) => (
                     <tr key={registro.id_registro}>
                         <td>{registro.id_registro}</td>
-                        <td>{registro.id_empleado}</td>
-                        <td>{registro.id_turno}</td>
-                        {/* Fecha solo con día/mes/año */}
-                        <td>
-                            {registro.fecha
-                                ? new Date(registro.fecha).toLocaleDateString()
-                                : ''}
+
+                        {/* Empleado con imagen */}
+                        <td className="d-flex align-items-center">
+                            {registro.foto ? (
+                                <Image
+                                    src={`data:image/png;base64,${registro.foto}`}
+                                    alt={registro.nombre + " " + registro.apellido}
+                                    roundedCircle
+                                    style={{ width: '50px', height: '50px', objectFit: 'cover', marginRight: '10px' }}
+                                />
+                            ) : (
+                                <div
+                                    style={{
+                                        width: '50px',
+                                        height: '50px',
+                                        backgroundColor: '#ccc',
+                                        borderRadius: '50%',
+                                        marginRight: '10px'
+                                    }}
+                                />
+                            )}
+                            <span>{registro.nombre} {registro.apellido}</span>
                         </td>
+
+                        <td>{registro.id_turno}</td>
+
+                        <td>{registro.fecha ? new Date(registro.fecha).toLocaleDateString() : ''}</td>
                         <td>{registro.hora_entrada}</td>
                         <td>{registro.hora_salida}</td>
                         <td>{registro.horas_trabajadas}</td>
+
                         <td>
                             <Button
                                 variant="warning"

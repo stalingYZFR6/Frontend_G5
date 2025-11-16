@@ -3,35 +3,34 @@ import { useNavigate } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
 import BotonTema from "../BotonTema.jsx";
 
-
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
 
-  // Alternar visibilidad del menú
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
-  // Navegar y cerrar menú
   const manejarNavegacion = (ruta) => {
     navigate(ruta);
     setMostrarMenu(false);
   };
 
+  const colorFondoNavbar = "#1e1e2f"; // Gris oscuro
+  const colorTextoNormal = "#dbc6d7ff"; // Gris claro
+  const colorTextoActivo = "#0400ffff"; // Dorado
+
   return (
-    <Navbar expand="md" fixed="top" className="bg-primary">
+    <Navbar
+      expand="md"
+      fixed="top"
+      style={{ backgroundColor: colorFondoNavbar, boxShadow: "0 2px 8px rgba(68, 13, 105, 1)" }}
+    >
       <Container>
         <Navbar.Brand
           onClick={() => manejarNavegacion("/")}
-          className="fw-bold"
-          style={{
-            color: "black",
-            fontSize: "1.8rem",
-            fontWeight: "bold",
-          }}
+          style={{ color: colorTextoActivo, fontSize: "1.8rem", fontWeight: "bold", cursor: "pointer" }}
         >
           Sistema Gestor De Empleados
         </Navbar.Brand>
-
 
         <header className="d-flex justify-content-end p-2">
           <BotonTema />
@@ -47,68 +46,35 @@ const Encabezado = () => {
           placement="end"
           show={mostrarMenu}
           onHide={() => setMostrarMenu(false)}
+          style={{ backgroundColor: "#111147ff" }}
         >
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menú principal</Offcanvas.Title>
+            <Offcanvas.Title style={{ color: colorTextoNormal }}>Menú principal</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="flex-grow-1 pe-3">
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/")}
-              >
-                {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null} Inicio
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/empleados")}
-              >
-                {mostrarMenu ? <i className="bi-person-vcard-fill me-2"></i> : null} Empleados
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/catalogo-empleados")}
-              >
-                {mostrarMenu ? <i className="bi-card-image me-2"></i> : null} Catálogo Empleados
-              </Nav.Link>
-
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/incidencias")}
-              >
-                {mostrarMenu ? <i className="bi-exclamation-triangle me-2"></i> : null} Incidencias
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/registroasistencia")}
-              >
-                {mostrarMenu ? <i className="bi-card-checklist me-2"></i> : null} Registro Asistencia
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/rol")}
-              >
-                {mostrarMenu ? <i className="bi-person-badge-fill me-2"></i> : null} Rol
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/turnos")}
-              >
-                {mostrarMenu ? <i className="bi-front me-2"></i> : null} Turnos
-              </Nav.Link>
-
-              <Nav.Link
-                className={mostrarMenu ? "texto-marca" : "text-white"}
-                onClick={() => manejarNavegacion("/usuarios")}
-              >
-                {mostrarMenu ? <i className="bi-people-fill me-2"></i> : null} Usuarios
-              </Nav.Link>
+              {[
+                { ruta: "/", icon: "bi-house-fill", label: "Inicio" },
+                { ruta: "/empleados", icon: "bi-person-vcard-fill", label: "Empleados" },
+                { ruta: "/catalogo-empleados", icon: "bi-card-image", label: "Catálogo Empleados" },
+                { ruta: "/incidencias", icon: "bi-exclamation-triangle", label: "Incidencias" },
+                { ruta: "/registroasistencia", icon: "bi-card-checklist", label: "Registro Asistencia" },
+                { ruta: "/rol", icon: "bi-person-badge-fill", label: "Rol" },
+                { ruta: "/turnos", icon: "bi-front", label: "Turnos" },
+                { ruta: "/usuarios", icon: "bi-people-fill", label: "Usuarios" },
+              ].map((item) => (
+                <Nav.Link
+                  key={item.ruta}
+                  onClick={() => manejarNavegacion(item.ruta)}
+                  style={{
+                    color: mostrarMenu ? colorTextoActivo : colorTextoNormal,
+                    marginBottom: "0.3rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  {mostrarMenu ? <i className={`${item.icon} me-2`}></i> : null} {item.label}
+                </Nav.Link>
+              ))}
             </Nav>
           </Offcanvas.Body>
         </Navbar.Offcanvas>
