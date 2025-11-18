@@ -6,6 +6,9 @@ import ModalRegistroAsistencia from "../components/RegistroAsistencia/ModalRegis
 import ModalEditarAsistencia from "../components/RegistroAsistencia/ModalEditarAsistencia";
 import ModalEliminarAsistencia from "../components/RegistroAsistencia/ModalEliminarAsistencia";
 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 const RegistroAsistencia = () => {
   const [registros, setRegistros] = useState([]);
   const [registrosFiltrados, setRegistrosFiltrados] = useState([]);
@@ -42,6 +45,12 @@ const RegistroAsistencia = () => {
       setCargando(false);
     }
   };
+
+
+  // generar reporte 
+  const generarPDFProductos = () => {
+    const doc = new jsPDF();
+  }
 
   // Obtener empleados
   const obtenerEmpleados = async () => {

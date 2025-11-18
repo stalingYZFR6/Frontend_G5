@@ -14,9 +14,9 @@ const Encabezado = () => {
     setMostrarMenu(false);
   };
 
-  const colorFondoNavbar = "#1e1e2f"; // Gris oscuro
-  const colorTextoNormal = "#dbc6d7ff"; // Gris claro
-  const colorTextoActivo = "#0400ffff"; // Dorado
+  const colorFondoNavbar = "#000000ff"; // Gris oscuro
+  const colorTextoNormal = "#ffbd08ff"; // Gris claro
+  const colorTextoActivo = "#ff0000ff"; // Dorado
 
   return (
     <Navbar
