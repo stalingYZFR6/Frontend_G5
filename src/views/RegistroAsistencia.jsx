@@ -7,7 +7,9 @@ import ModalEditarAsistencia from "../components/RegistroAsistencia/ModalEditarA
 import ModalEliminarAsistencia from "../components/RegistroAsistencia/ModalEliminarAsistencia";
 
 import jsPDF from "jspdf";
+import * as XLSX from "xlsx";
 import autoTable from "jspdf-autotable";
+import { saveAs } from "file-saver";
 
 const RegistroAsistencia = () => {
   const [registros, setRegistros] = useState([]);
@@ -31,7 +33,7 @@ const RegistroAsistencia = () => {
   const [empleados, setEmpleados] = useState([]);
   const [turnos, setTurnos] = useState([]);
 
-  // Obtener registros
+  // ────────────────────── OBTENER REGISTROS ──────────────────────
   const obtenerRegistros = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/registroasistencia");
@@ -46,125 +48,41 @@ const RegistroAsistencia = () => {
     }
   };
 
-
-  // generar reporte 
-  const generarPDFProductos = () => {
-    const doc = new jsPDF();
-  }
-
-  // Obtener empleados
   const obtenerEmpleados = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/empleados");
-      if (!respuesta.ok) throw new Error("Error al obtener empleados");
-      const datos = await respuesta.json();
-      setEmpleados(datos);
+      const res = await fetch("http://localhost:3000/api/empleados");
+      if (!res.ok) throw new Error("Error al obtener empleados");
+      const data = await res.json();
+      setEmpleados(data);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Obtener turnos
   const obtenerTurnos = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/turnos");
-      if (!respuesta.ok) throw new Error("Error al obtener turnos");
-      const datos = await respuesta.json();
-      setTurnos(datos);
+      const res = await fetch("http://localhost:3000/api/turnos");
+      if (!res.ok) throw new Error("Error al obtener turnos");
+      const data = await res.json();
+      setTurnos(data);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Manejar cambios en inputs
-  const manejarCambioInput = (e) => {
-    const { name, value } = e.target;
-    if (asistenciaSeleccionada) {
-      setAsistenciaSeleccionada(prev => ({ ...prev, [name]: value }));
-    } else {
-      setNuevoRegistro(prev => ({ ...prev, [name]: value }));
-    }
-  };
+  useEffect(() => {
+    obtenerRegistros();
+    obtenerEmpleados();
+    obtenerTurnos();
+  }, []);
 
-  // Agregar nuevo registro
-  const agregarRegistro = async () => {
-    if (!nuevoRegistro.id_empleado || !nuevoRegistro.id_turno || !nuevoRegistro.fecha || !nuevoRegistro.hora_entrada || !nuevoRegistro.hora_salida) return;
-
-    try {
-      const respuesta = await fetch("http://localhost:3000/api/registroasistencia", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoRegistro),
-      });
-
-      if (!respuesta.ok) throw new Error("Error al guardar registro de asistencia");
-
-      setNuevoRegistro({
-        id_empleado: "",
-        id_turno: "",
-        fecha: "",
-        hora_entrada: "",
-        hora_salida: "",
-      });
-      setMostrarModal(false);
-      await obtenerRegistros();
-    } catch (error) {
-      console.error("Error al agregar registro:", error);
-      alert("No se pudo guardar el registro. Revisa la consola.");
-    }
-  };
-
-  // Editar registro
-  const editarAsistencia = async (id) => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/registroAsistencia/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_empleado: asistenciaSeleccionada.id_empleado,
-          id_turno: asistenciaSeleccionada.id_turno,
-          fecha: asistenciaSeleccionada.fecha,
-          hora_entrada: asistenciaSeleccionada.hora_entrada,
-          hora_salida: asistenciaSeleccionada.hora_salida
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.message || "Error al editar registro de asistencia");
-      }
-
-      setMostrarModalEditar(false);
-      setAsistenciaSeleccionada(null);
-      await obtenerRegistros();
-    } catch (error) {
-      console.error("Error al editar registro:", error);
-      alert(error.message);
-    }
-  };
-
-  // Eliminar registro
-  const eliminarAsistencia = async (id) => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Error al eliminar registro de asistencia");
-
-      setMostrarModalEliminar(false);
-      setAsistenciaSeleccionada(null);
-      await obtenerRegistros();
-    } catch (error) {
-      console.error("Error al eliminar registro:", error);
-      alert("No se pudo eliminar el registro.");
-    }
-  };
-
-  // Buscar registros
+  // ────────────────────── BUSQUEDA ──────────────────────
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setTextoBusqueda(texto);
 
     const filtrados = registros.filter(
-      registro =>
+      (registro) =>
         registro.id_registro.toString().includes(texto) ||
         registro.id_empleado?.toString().includes(texto) ||
         registro.id_turno?.toString().includes(texto) ||
@@ -177,42 +95,166 @@ const RegistroAsistencia = () => {
     setRegistrosFiltrados(filtrados);
   };
 
-  useEffect(() => {
-    obtenerRegistros();
-    obtenerEmpleados();
-    obtenerTurnos();
-  }, []);
+  // ────────────────────── MANEJO DE INPUT ──────────────────────
+  const manejarCambioInput = (e) => {
+    const { name, value } = e.target;
+    if (asistenciaSeleccionada) {
+      setAsistenciaSeleccionada((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setNuevoRegistro((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
+  // ────────────────────── CRUD ──────────────────────
+  const agregarRegistro = async () => {
+    if (
+      !nuevoRegistro.id_empleado ||
+      !nuevoRegistro.id_turno ||
+      !nuevoRegistro.fecha ||
+      !nuevoRegistro.hora_entrada ||
+      !nuevoRegistro.hora_salida
+    )
+      return;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/registroasistencia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoRegistro),
+      });
+      if (!res.ok) throw new Error("Error al guardar registro");
+
+      setNuevoRegistro({
+        id_empleado: "",
+        id_turno: "",
+        fecha: "",
+        hora_entrada: "",
+        hora_salida: "",
+      });
+      setMostrarModal(false);
+      await obtenerRegistros();
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar el registro.");
+    }
+  };
+
+  const editarAsistencia = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/registroAsistencia/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(asistenciaSeleccionada),
+      });
+      if (!res.ok) throw new Error("Error al editar registro");
+      setMostrarModalEditar(false);
+      setAsistenciaSeleccionada(null);
+      await obtenerRegistros();
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
+  const eliminarAsistencia = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/registroasistencia/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Error al eliminar registro");
+      setMostrarModalEliminar(false);
+      setAsistenciaSeleccionada(null);
+      await obtenerRegistros();
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo eliminar el registro.");
+    }
+  };
+
+  // ────────────────────── EXPORTAR A EXCEL ──────────────────────
+  const exportarExcel = () => {
+    const datos = registrosFiltrados.map((r) => ({
+      ID: r.id_registro,
+      Empleado: r.id_empleado,
+      Turno: r.id_turno,
+      Fecha: r.fecha,
+      "Hora Entrada": r.hora_entrada,
+      "Hora Salida": r.hora_salida,
+      "Horas Trabajadas": r.horas_trabajadas,
+    }));
+
+    const hoja = XLSX.utils.json_to_sheet(datos);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Asistencia");
+
+    const buffer = XLSX.write(libro, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+    const fecha = new Date();
+    saveAs(blob, `RegistroAsistencia_${fecha.getDate()}${fecha.getMonth() + 1}${fecha.getFullYear()}.xlsx`);
+  };
+
+  // ────────────────────── EXPORTAR A PDF ──────────────────────
+  const generarPDF = () => {
+  const doc = new jsPDF();
+  const columnas = ["ID Registro", "Empleado", "Turno", "Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
+
+  const filas = registrosFiltrados.map(registro => {
+    const empleado = empleados.find(e => e.id_empleado === registro.id_empleado);
+
+    // Formatear fecha: DD/MM/YYYY
+    const fecha = new Date(registro.fecha);
+    const fechaFormateada = `${fecha.getDate().toString().padStart(2, "0")}/${(fecha.getMonth()+1).toString().padStart(2,"0")}/${fecha.getFullYear()}`;
+
+    return [
+      registro.id_registro,
+      empleado ? empleado.nombre : registro.id_empleado,
+      registro.id_turno,
+      fechaFormateada,  // <-- fecha ya formateada
+      registro.hora_entrada,
+      registro.hora_salida,
+      registro.horas_trabajadas
+    ];
+  });
+
+  autoTable(doc, {
+    head: [columnas],
+    body: filas,
+    startY: 20,
+    theme: "grid",
+    styles: { fontSize: 12, cellPadding: 2 },
+  });
+
+  const fechaHoy = new Date();
+  const nombreArchivo = `RegistroAsistencia_${fechaHoy.getDate()}${fechaHoy.getMonth() + 1}${fechaHoy.getFullYear()}.pdf`;
+  doc.save(nombreArchivo);
+};
+
+
+  // ────────────────────── RENDER ──────────────────────
   return (
     <Container className="mt-5">
-      <Row>
+      <Row className="mb-3">
         <Col lg={5} md={8} sm={8} xs={7}>
-          <CuadroBusquedas
-            textoBusqueda={textoBusqueda}
-            manejarCambioBusqueda={manejarCambioBusqueda}
-          />
+          <CuadroBusquedas textoBusqueda={textoBusqueda} manejarCambioBusqueda={manejarCambioBusqueda} />
         </Col>
         <Col className="text-end">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => setMostrarModal(true)}>
+          <Button variant="primary" size="lg" onClick={() => setMostrarModal(true)}>
             Nuevo Registro
           </Button>
         </Col>
       </Row>
 
-
-      <Row className="align-items-center text-center text-md-start mb-4">
-        <Col>
-          <h1 className="display-4 fw-bold text-primary">Registro de Asistencia</h1>
-          <p className="lead text-secondary">
-            Visualiza y administra los registros de asistencia de los empleados.
-          </p>
+      <Row className="mb-3">
+        <Col lg={3} md={4} sm={4} xs={5}>
+          <Button variant="secondary" onClick={exportarExcel} style={{ width: "100%" }}>
+            Exportar Excel
+          </Button>
+        </Col>
+        <Col lg={3} md={4} sm={4} xs={5}>
+          <Button variant="secondary" onClick={generarPDF} style={{ width: "100%" }}>
+            Exportar PDF
+          </Button>
         </Col>
       </Row>
 
-      {/* Tabla */}
       <TablaRegistroAsistencia
         registros={registrosFiltrados}
         cargando={cargando}
@@ -221,7 +263,6 @@ const RegistroAsistencia = () => {
         setAsistenciaSeleccionada={setAsistenciaSeleccionada}
       />
 
-      {/* Modal Agregar */}
       <ModalRegistroAsistencia
         mostrarModal={mostrarModal}
         setMostrarModal={setMostrarModal}
@@ -232,7 +273,6 @@ const RegistroAsistencia = () => {
         turnos={turnos}
       />
 
-      {/* Modal para editar */}
       {asistenciaSeleccionada && (
         <ModalEditarAsistencia
           mostrarModal={mostrarModalEditar}
@@ -240,13 +280,11 @@ const RegistroAsistencia = () => {
           asistenciaSeleccionada={asistenciaSeleccionada}
           manejarCambioInput={manejarCambioInput}
           editarAsistencia={editarAsistencia}
-          empleados={empleados}   // <-- Se pasan los empleados
-          turnos={turnos}         // <-- Se pasan los turnos
+          empleados={empleados}
+          turnos={turnos}
         />
       )}
 
-
-      {/* Modal Eliminar */}
       {asistenciaSeleccionada && (
         <ModalEliminarAsistencia
           mostrarModal={mostrarModalEliminar}
